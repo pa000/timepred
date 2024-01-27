@@ -1,4 +1,6 @@
 from datetime import date, datetime
+from timepred.processing.constants import WROCLAW_TZ
+import re
 import os
 from pathlib import Path
 from django.core.management.base import BaseCommand
@@ -10,33 +12,41 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-URL = "https://www.wroclaw.pl/open-data/87b09b32-f076-4475-8ec9-6020ed1f9ac0/OtwartyWroclaw_rozklad_jazdy_GTFS.zip"
-
+HISTORY_URL = "https://opendata.cui.wroclaw.pl/dataset/rozkladjazdytransportupublicznegoplik_data/resource_history/9a5a2a1a-12f5-4533-82b0-21eee30dbe51"
+URL_PATTERN =  "https://www.wroclaw.pl/open-data/dataset/657cc0c0-3ed6-48ed-976f-8ddf5f576f09/resource/8cfbf542-c477-47ca-bddd-0492670a3987/download_old_version/[^\"]+.zip"
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        filename = self.download_feed()
-        if filename is None:
-            return
+        feed_urls = self.get_feed_urls()
+        for feed_url in feed_urls:
+            filename = self.download_feed(feed_url)
+            if filename is None:
+                return
 
-        feed = gk.read_feed(Path(filename), dist_units="km")
-        feed_start_date: datetime = gk.helpers.datestr_to_date(
-            feed.feed_info["feed_start_date"][0]
-        )
+            feed = gk.read_feed(Path(filename), dist_units="km")
+            feed_start_date: date = gk.helpers.datestr_to_date(
+                feed.feed_info["feed_start_date"][0]
+            )
 
-        last_date = self.get_latest_feed_start_date()
-        if not last_date or feed_start_date > last_date:
-            logging.debug(feed_start_date)
-            name = feed_start_date or str(date.today())
-            feed = Feed.objects.create(name=name)
-            feed.import_gtfs(filename)
+            logging.debug(f"{filename} starts on {feed_start_date}")
+            exists_feed = self.exists_feed_starting_on(feed_start_date)
+            if not exists_feed:
+                logging.debug("and is a new feed")
+                name = feed_start_date or str(date.today())
+                feed = Feed.objects.create(name=name)
+                feed.import_gtfs(filename)
+            else:
+                logging.debug("and already have that feed")
 
-        os.remove(filename)
+            os.remove(filename)
 
-    def download_feed(self) -> str | None:
-        filename = URL.split("/")[-1]
+            if feed_start_date <= datetime.now(WROCLAW_TZ).date():
+                break
+
+    def download_feed(self, url: str) -> str | None:
+        filename = url.split("/")[-1]
         logging.debug(f"{filename}...")
-        response = requests.get(URL)
+        response = requests.get(url)
         if not response.ok:
             logging.debug("not ok")
             return None
@@ -48,13 +58,13 @@ class Command(BaseCommand):
 
         return filename
 
-    def get_latest_feed_start_date(self) -> date | None:
-        feed = (
-            FeedInfo.objects.filter(start_date__isnull=False)
-            .order_by("start_date")
-            .last()
-        )
-        if feed is None:
-            return None
+    def exists_feed_starting_on(self, date: date) -> bool:
+        return FeedInfo.objects.filter(start_date=date).exists()
 
-        return feed.start_date
+    def get_feed_urls(self) -> list[str]:
+        response = requests.get(HISTORY_URL)
+        text = response.text
+        feed_urls = re.findall(URL_PATTERN, text)
+
+        # the url appears twice for every feed
+        return feed_urls[::2]
