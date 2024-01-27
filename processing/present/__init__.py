@@ -6,6 +6,7 @@ import itertools
 from multiprocessing.managers import DictProxy
 import os
 from typing import Iterable
+from django.conf import settings
 from django.db import IntegrityError, transaction
 from django import db
 from django.db import connection
@@ -46,8 +47,8 @@ def init(interactive: bool):
 
     db.connections.close_all()
 
-    NPROC = 8
-    for _ in range(NPROC):
+    nproc = getattr(settings, "TIMEPRED_NPROC", 2)
+    for _ in range(nproc):
         p = Process(
             target=_process_raw_data,
             args=(vehicle_queue, result_queue, vehicle_cache),
