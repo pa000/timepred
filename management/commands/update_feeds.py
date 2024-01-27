@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import os
 from pathlib import Path
 from django.core.management.base import BaseCommand
@@ -20,12 +20,12 @@ class Command(BaseCommand):
             return
 
         feed = gk.read_feed(Path(filename), dist_units="km")
-        feed_start_date = gk.helpers.datestr_to_date(
+        feed_start_date: datetime = gk.helpers.datestr_to_date(
             feed.feed_info["feed_start_date"][0]
         )
 
         last_date = self.get_latest_feed_start_date()
-        if feed_start_date > last_date:  # type: ignore
+        if not last_date or feed_start_date > last_date:
             logging.debug(feed_start_date)
             name = feed_start_date or str(date.today())
             feed = Feed.objects.create(name=name)
