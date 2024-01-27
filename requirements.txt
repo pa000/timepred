@@ -1,0 +1,12 @@
+asgiref==3.7.2
+click==8.1.7
+Django==5.0.1
+nodeenv==1.8.0
+numpy==1.26.3
+packaging==23.2
+pathspec==0.12.1
+platformdirs==4.1.0
+psycopg2==2.9.9
+pytz==2023.3.post1
+shapely==2.0.2
+sqlparse==0.4.4
