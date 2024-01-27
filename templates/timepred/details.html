@@ -1,0 +1,33 @@
+<div class="fixed right-5 top-3 flex justify-end z-30"><button onclick="$('#details').hide()" class="material-symbols-outlined bg-slate-700 p-2 text-slate-100">close</button></div>
+
+<div class="sticky top-0 bg-slate-600 text-slate-50 z-20">
+  <div class="text-center text-xl font-semibold bg-slate-700 py-1">
+    <span class="bg-slate-50 text-slate-700 px-1 rounded-md">{{ route_name }}</span> {{ headsign }}
+  </div>
+  <div class="flex gap-2 justify-center items-center content-stretch p-2 border-b-2 border-slate-800 font-bold text-lg">
+    <div class="border-r-2 pr-2 border-slate-500">Planowy<br/>przyjazd</div>
+    <div class="border-r-2 pr-2 border-slate-500">Rzeczywisty<br/>przyjazd</div>
+    <div class="flex-grow-[4] text-center">Przystanek<br/><span class="text-base font-normal">przewidywany przyjazd</span></div>
+  </div>
+</div>
+<table class="w-full">
+  {% for stoptime in stop_times %}
+  <tr
+    class="border-b-2 {% if stoptime.stop_sequence == next_stoptime.stop_sequence %} bg-slate-200 {% elif stoptime.stop_sequence < next_stoptime.stop_sequence %} z-0 opacity-40 {%endif%}">
+    <td class="text-center p-2">{{stoptime.arrival_time|stringformat:"s"|slice:":-3"|mod24}}</td>
+    <td class="text-center font-bold">{% if stoptime.real_arrival_time %} {{ stoptime.real_arrival_time|date:"H:i" }} {% else  %} b/d {% endif %}</td>
+    <td class="text-left p-2 "><button class="text-lg bg-slate-200 p-1 rounded-sm" onclick="ctx.setDetails('stop', {{stoptime.stop.code}})"><b>{{stoptime.stop.name}}</b></button>
+      {% if stoptime.estimated_times %}
+      <div class="grid gap-y-1 my-1" style="grid-template-columns: auto repeat(100, 1fr)">
+      {% for etp in stoptime.estimated_times %}
+        {% widthratio etp.1 1 100 as width %}
+        {% widthratio etp.1 0.5 50 as op %}
+        <div class="col-start-1 col-end-1 px-1"><span class="px-1 font-medium">{{ etp.0|date:"H:i" }}</span> {{ width }}%</div>
+        <div class="bg-slate-600 col-start-2" style="grid-column-end: span {{ width }}; opacity: {{ op|add:50 }}%"></div>
+      {% endfor %}
+      </div>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>

@@ -1,0 +1,20 @@
+<div class="fixed right-5 top-3 flex justify-end z-30"><button onclick="$('#details').hide()"
+    class="material-symbols-outlined bg-slate-700 p-2 text-slate-100">close</button></div>
+
+<div class="sticky top-0 bg-slate-600 text-slate-50 z-20">
+  <div class="text-center text-xl font-semibold bg-slate-700 py-1">
+    {{ stop_name }}
+  </div>
+  <div class="flex gap-2 justify-center items-center content-stretch p-2 border-b-2 border-slate-800 font-bold text-lg">
+    <div class="border-r-2 pr-2 border-slate-500">Przewidywany<br />przyjazd</div>
+    <div class="flex-grow-[4] text-center">Linia, kierunek</div>
+  </div>
+</div>
+<table class="w-full">
+  {% for pred in predictions %}
+  <tr class="border-b-2"> 
+    <td class="text-center p-2">{{pred.time|date:"H:i"}} <span class="text-sm bg-slate-200 rounded-md p-1">{{ pred.probability }}</span></td>
+    <td class="text-left p-2 "><button class="text-lg" {% if pred.vehicle_id %} onclick="ctx.setDetails('vehicle', {{ pred.vehicle_id }})" {% endif %}><b>{{pred.route_name}} {{pred.headsign}}</b></button> </td>
+  </tr>
+  {% endfor %}
+</table>
