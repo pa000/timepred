@@ -8,7 +8,7 @@ from django.db import DEFAULT_DB_ALIAS, connection, models
 from multigtfs.models.route import Route
 from multigtfs.models.stop_time import StopTime
 from multigtfs.models.trip import Trip
-import pytz
+from timepred.processing.constants import WROCLAW_TZ
 
 
 class AverageTravelTime(models.Model):
@@ -71,7 +71,7 @@ class StopTimePrediction(models.Model):
         values = list(values)
         if "time" in field_names:
             i = field_names.index("time")
-            values[i] = values[i].astimezone(pytz.timezone("Europe/Warsaw"))
+            values[i] = values[i].astimezone(WROCLAW_TZ)
         return super().from_db(db, field_names, values)
 
 
@@ -95,7 +95,7 @@ class RawVehicleData(models.Model):
         values = list(values)
         if "timestamp" in field_names:
             i = field_names.index("timestamp")
-            values[i] = values[i].astimezone(pytz.timezone("Europe/Warsaw"))
+            values[i] = values[i].astimezone(WROCLAW_TZ)
         return super().from_db(db, field_names, values)
 
     def __str__(self) -> str:
@@ -119,11 +119,11 @@ class VehicleStopTime(models.Model):
         if "arrival_time" in field_names:
             i = field_names.index("arrival_time")
             if values[i] is not None:
-                values[i] = values[i].astimezone(pytz.timezone("Europe/Warsaw"))
+                values[i] = values[i].astimezone(WROCLAW_TZ)
         if "departure_time" in field_names:
             i = field_names.index("departure_time")
             if values[i] is not None:
-                values[i] = values[i].astimezone(pytz.timezone("Europe/Warsaw"))
+                values[i] = values[i].astimezone(WROCLAW_TZ)
         return super().from_db(db, field_names, values)
 
     def __str__(self) -> str:
@@ -163,7 +163,7 @@ class VehicleCache(models.Model):
         values = list(values)
         if "timestamp" in field_names:
             i = field_names.index("timestamp")
-            values[i] = values[i].astimezone(pytz.timezone("Europe/Warsaw"))
+            values[i] = values[i].astimezone(WROCLAW_TZ)
         return super().from_db(db, field_names, values)
 
     def __str__(self) -> str:

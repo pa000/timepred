@@ -3,11 +3,11 @@ from datetime import date, datetime, time, timedelta
 from dataclasses import dataclass
 
 from django.db.models import Max, Min
-import pytz
 
 from multigtfs.models.feed import Feed
 from multigtfs.models.feed_info import FeedInfo
 from multigtfs.models.route import Route
+from timepred.processing.constants import WROCLAW_TZ
 
 
 @dataclass
@@ -56,13 +56,9 @@ class RouteByDate:
             ).all():
                 rbd[start_date][route.route_id] = RouteInfo(
                     route=route,
-                    start_time=datetime.combine(
-                        start_date, time(0, tzinfo=pytz.timezone("Europe/Warsaw"))
-                    )
+                    start_time=datetime.combine(start_date, time(0, tzinfo=WROCLAW_TZ))
                     + timedelta(seconds=route.start_time.seconds),  # type: ignore
-                    end_time=datetime.combine(
-                        start_date, time(0, tzinfo=pytz.timezone("Europe/Warsaw"))
-                    )
+                    end_time=datetime.combine(start_date, time(0, tzinfo=WROCLAW_TZ))
                     + timedelta(seconds=route.end_time.seconds),  # type: ignore
                 )
 
@@ -94,7 +90,7 @@ class RouteByDate:
         return self.prepare_route_by_date_between(start_date, end_date)
 
     def prepare_route_by_date_today(self) -> RouteByDateDict:
-        today = datetime.now(pytz.timezone("Europe/Warsaw")).date()
+        today = datetime.now(WROCLAW_TZ).date()
         return self.prepare_route_by_date_between(
             today - timedelta(days=2), today + timedelta(days=1)
         )

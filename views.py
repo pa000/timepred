@@ -1,7 +1,7 @@
 import datetime
-import pytz
 
 import shapely
+from timepred.processing.constants import WROCLAW_TZ, WROCLAW_UTM, WSG84
 from timepred.processing.future import estimate_travel_time
 from timepred.processing.geohelper import cut
 from timepred.processing.present.get import get_position, get_route_ids
@@ -14,7 +14,12 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from multigtfs.models import StopTime
 
-from timepred.models import RawVehicleData, StopPrediction, StopTimePrediction, VehicleCache
+from timepred.models import (
+    RawVehicleData,
+    StopPrediction,
+    StopTimePrediction,
+    VehicleCache,
+)
 
 
 def index(request):
@@ -79,7 +84,7 @@ def stop(request):
     if stop_code is None:
         return JsonResponse({}, safe=False)
 
-    now = datetime.datetime.now(pytz.timezone("Europe/Warsaw"))
+    now = datetime.datetime.now(WROCLAW_TZ)
     day_start = now.replace(hour=0, minute=0, second=0)
     since_day_start = now - day_start
     stoptimes = StopTime.objects.select_related("trip").filter(
@@ -177,18 +182,18 @@ def details(request):
         return JsonResponse({}, safe=False)
 
     geometry = trip.geometry
-    geometry.transform(32633)
+    geometry.transform(WROCLAW_UTM)
     geometry_simpl = geometry.simplify(2)
 
-    vehicle.position.transform(32633)
+    vehicle.position.transform(WROCLAW_UTM)
     simpl_dist = geometry_simpl.project(vehicle.position)
     prev, next = cut(shapely.LineString(geometry_simpl), simpl_dist)
-    prev = LineString(list(prev.coords), srid=32633)
-    next = LineString(list(next.coords), srid=32633)
-    prev.transform(4326)
-    next.transform(4326)
+    prev = LineString(list(prev.coords), srid=WROCLAW_UTM)
+    next = LineString(list(next.coords), srid=WROCLAW_UTM)
+    prev.transform(WSG84)
+    next.transform(WSG84)
 
-    geometry_simpl.transform(4326)
+    geometry_simpl.transform(WSG84)
     shape_simpl = geometry_simpl
 
     stop_times: QuerySet[StopTime] = trip.stoptime_set.select_related("stop").order_by(
@@ -233,12 +238,12 @@ def details(request):
         stop_times_with_real[st].estimated_times = ets
 
     pos = geometry.interpolate(vehicle.shape_dist)
-    pos.transform(4326)
+    pos.transform(WSG84)
 
     proj: dict[StopTime, Point] = {}
     for st in stop_times:
         proj[st] = geometry.interpolate(st.shape_dist_traveled)
-        proj[st].transform(4326)
+        proj[st].transform(WSG84)
 
     details = {
         "stop_times": stop_times_with_real,
@@ -260,9 +265,11 @@ def details(request):
                 for stoptime in stop_times
             },
             "next_stop_id": vehicle.next_stoptime.stop.stop_id,
-            "current_stop_id": vehicle.current_vehiclestoptime.stoptime.stop.stop_id
-            if vehicle.current_vehiclestoptime is not None
-            else -1,
+            "current_stop_id": (
+                vehicle.current_vehiclestoptime.stoptime.stop.stop_id
+                if vehicle.current_vehiclestoptime is not None
+                else -1
+            ),
             "view": render_to_string("app/details.html", details),
             "shape_pos": pos,
         },

@@ -2,7 +2,6 @@ from datetime import date, datetime, time, timedelta
 import logging
 from django.db.models import Max, Min
 
-import pytz
 from timepred.models import RawVehicleData, TripInstance, VehicleCache
 from multigtfs.models.feed import Feed
 from multigtfs.models.feed_info import FeedInfo

@@ -2,11 +2,11 @@ from hypothesis import given
 from hypothesis.extra.django import TestCase, from_model
 import hypothesis.strategies as st
 
-from web.models import RawVehicleData
+from timepred.models import RawVehicleData
 from multigtfs.models.feed import Feed
 from multigtfs.models.route import Route
 from multigtfs.models.trip import Trip
-from processing.present.guess import guess_route, recalculate_route_by_date
+from processing.present.guess import guess_route
 
 
 # Create your tests here.

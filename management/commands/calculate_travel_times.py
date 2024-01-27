@@ -1,10 +1,12 @@
+from datetime import date, timezone
 import logging
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from multigtfs.models.feed import Feed
 from multigtfs.models.trip import Trip
 
 import sys
-import past
+import timepred.processing.past as past
 
 logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
@@ -15,4 +17,4 @@ class Command(BaseCommand):
         if feed is None:
             return
 
-        past.calculate_travel_times_feed(feed)
+        past.calculate_travel_times(1, timezone.now())

@@ -13,10 +13,10 @@ from django.core.management.base import BaseCommand
 from django.db import IntegrityError
 from django.db.models import Q
 
-from app.models import RawVehicleData, VehicleCache
-import present
-import future
-from present import process_many_data
+from timepred.models import RawVehicleData, VehicleCache
+import timepred.processing.present as present
+import timepred.processing.future as future
+from timepred.processing.present import process_many_data
 
 present.init(False)
 future.init(False)

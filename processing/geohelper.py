@@ -3,6 +3,7 @@ import shapely
 
 from multigtfs.models.stop_time import StopTime
 from multigtfs.models.trip import Trip
+from timepred.processing.constants import WROCLAW_UTM
 
 
 def cut(

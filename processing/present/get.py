@@ -7,6 +7,7 @@ from django.db.models import QuerySet, Q
 import shapely
 from timepred.models import RawVehicleData, VehicleCache
 from timepred.processing.geohelper import remove_closest_segments
+from timepred.processing.constants import WROCLAW_UTM, WSG84
 from multigtfs.models.feed import Feed
 from multigtfs.models.route import Route
 from multigtfs.models.stop_time import StopTime
@@ -14,7 +15,7 @@ from multigtfs.models.trip import Trip
 
 
 def get_position(rd: RawVehicleData) -> Point:
-    return Point(rd.longitude, rd.latitude, srid=4326)
+    return Point(rd.longitude, rd.latitude, srid=WSG84)
 
 
 def get_route_ids():

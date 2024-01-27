@@ -1,10 +1,11 @@
 from django.core.management.base import BaseCommand
 import zoneinfo
 from django.db import IntegrityError
-import pytz
-from app.models import RawVehicleData, VehicleCache
+from timepred.models import RawVehicleData, VehicleCache
 from typing import Dict
 import logging
+
+from timepred.processing.constants import WROCLAW_TZ
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -13,8 +14,8 @@ import random
 import requests
 import time
 import warnings
-import present
-from present import process_many_data
+import timepred.processing.present as present
+from timepred.processing.present import process_many_data
 
 present.init(True)
 
@@ -39,7 +40,7 @@ class Command(BaseCommand):
         last_raw_data: dict[int, RawVehicleData] = {
             rd.vehicle_id: rd
             for rd in RawVehicleData.objects.filter(
-                timestamp__gte=datetime.datetime.now(pytz.timezone("Europe/Warsaw"))
+                timestamp__gte=datetime.datetime.now(WROCLAW_TZ)
                 - datetime.timedelta(minutes=5)
             )
             .order_by("vehicle_id", "-timestamp")
@@ -64,7 +65,7 @@ class Command(BaseCommand):
             process_many_data(updated_raw_data.values())
 
             VehicleCache.objects.filter(
-                timestamp__lt=datetime.datetime.now(pytz.timezone("Europe/Warsaw"))
+                timestamp__lt=datetime.datetime.now(WROCLAW_TZ)
                 - datetime.timedelta(minutes=5)
             ).delete()
 
@@ -84,8 +85,7 @@ class Command(BaseCommand):
             for k in new_data
             if k not in old_data
             or old_data[k].timestamp < new_data[k].timestamp
-            and datetime.datetime.now(pytz.timezone("Europe/Warsaw"))
-            - new_data[k].timestamp
+            and datetime.datetime.now(WROCLAW_TZ) - new_data[k].timestamp
             <= datetime.timedelta(minutes=5)
         }
 

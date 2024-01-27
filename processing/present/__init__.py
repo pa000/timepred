@@ -10,7 +10,6 @@ from django.db import IntegrityError, transaction
 from django import db
 from django.db import connection
 import shapely
-import pytz
 
 from django.core.cache import cache
 from timepred.models import (
@@ -30,7 +29,7 @@ from multigtfs.models.trip import Trip
 from timepred.processing.present import guess
 from timepred.processing.present.guess import guess_delay, guess_vehicle_data
 from timepred.processing.present.update import update_vehicle_data
-import timepred.processing.future
+import timepred.processing.future as future
 
 from multiprocessing import Pool, Manager, Process, Queue
 

@@ -1,6 +1,10 @@
 import logging
-from web.models import RawVehicleData, VehicleCache, VehicleStopTime
-from processing.present.get import get_next_stoptime, get_position, get_shape_dist
+from timepred.models import RawVehicleData, VehicleCache, VehicleStopTime
+from timepred.processing.present.get import (
+    get_next_stoptime,
+    get_position,
+    get_shape_dist,
+)
 
 from .guess import guess_vehicle_data, guess_vehicle_data_after_end_of_trip
 
