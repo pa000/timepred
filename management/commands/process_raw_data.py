@@ -29,7 +29,7 @@ class Command(BaseCommand):
         # fmt: off
         unprocessed = (
             RawVehicleData.objects
-            .filter(~Q(route_name=''), processed=False, timestamp__gte='2023-12-26 03:00:00+01:00')
+            .filter(~Q(route_name=''), processed=False, timestamp__gte='2024-01-15 23:00:00+01:00')
             .order_by("timestamp")
         )
         # fmt: on

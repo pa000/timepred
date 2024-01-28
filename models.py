@@ -12,8 +12,8 @@ from timepred.processing.constants import WROCLAW_TZ
 
 
 class AverageTravelTime(models.Model):
-    from_stop_code = models.CharField(max_length=255, primary_key=True)
-    to_stop_code = models.CharField(max_length=255)
+    from_stop_code = models.CharField(max_length=255, db_index=True)
+    to_stop_code = models.CharField(max_length=255, db_index=True)
     bin = models.IntegerField()
     average_travel_time = models.DurationField()
     hour = models.IntegerField()
@@ -54,9 +54,7 @@ class StopPrediction(models.Model):
     stop_code = models.CharField(max_length=255, db_index=True)
     stoptime = models.ForeignKey(StopTime, on_delete=models.CASCADE)
     trip_instance = models.ForeignKey(TripInstance, on_delete=models.CASCADE)
-    made_at_next_stoptime = models.ForeignKey(
-        StopTime, on_delete=models.CASCADE, related_name="+"
-    )
+    made_at = models.ForeignKey(StopTime, on_delete=models.CASCADE, related_name="+")
 
 
 class StopTimePrediction(models.Model):

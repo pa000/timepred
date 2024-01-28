@@ -2,7 +2,6 @@ import datetime
 
 import shapely
 from timepred.processing.constants import WROCLAW_TZ, WROCLAW_UTM, WSG84
-from timepred.processing.future import estimate_travel_time
 from timepred.processing.geohelper import cut
 from timepred.processing.present.get import get_position, get_route_ids
 from django.core.cache import cache
@@ -23,7 +22,7 @@ from timepred.models import (
 
 
 def index(request):
-    return render(request, "app/index.html", {"lines": get_route_ids()})
+    return render(request, "timepred/index.html", {"lines": get_route_ids()})
 
 
 class FlippedCoordsEncoder(DjangoJSONEncoder):
@@ -152,7 +151,7 @@ def stop(request):
     return JsonResponse(
         {
             "view": render_to_string(
-                "app/stop_details.html",
+                "timepred/stop_details.html",
                 {
                     "predictions": sorted(
                         predictions.values(), key=lambda p: p["time"]
@@ -270,7 +269,7 @@ def details(request):
                 if vehicle.current_vehiclestoptime is not None
                 else -1
             ),
-            "view": render_to_string("app/details.html", details),
+            "view": render_to_string("timepred/details.html", details),
             "shape_pos": pos,
         },
         safe=False,

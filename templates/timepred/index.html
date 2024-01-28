@@ -17,12 +17,13 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-  <link rel="stylesheet" href="{% static 'app/style.css' %}">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  <script src="{% static 'app/map.js' %}" defer></script>
-  <script src="{% static 'app/present.js' %}" defer></script>
-  <script src="{% static 'app/past.js' %}" defer></script>
-  <script src="{% static 'app/script.js' %}" defer></script>
+  <link rel="stylesheet" href="{% static 'timepred/style.css' %}">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script src="{% static 'timepred/map.js' %}" defer></script>
+  <script src="{% static 'timepred/present.js' %}" defer></script>
+  <script src="{% static 'timepred/past.js' %}" defer></script>
+  <script src="{% static 'timepred/script.js' %}" defer></script>
 
 </head>
 
@@ -40,16 +41,20 @@
       </div>
       <div id="curtime"> </div>
     </div>
-    <div class="fixed bottom-0 left-0 right-0 mx-auto w-fit font-semibold flex justify-center items-center border-slate-800 border-t-2 border-x-2 rounded-t-md bg-slate-600 text-slate-50 p-2 z-[5]"><span class="text-xl">Wybór linii</span><button class="bg-cyan-50 text-slate-600 p-1 mx-2 text-sm rounded-md" onclick="$('#lines').show()">Pokaż</button></div>
+    <div
+      class="fixed bottom-0 left-0 right-0 mx-auto w-fit font-semibold flex justify-center items-center border-slate-800 border-t-2 border-x-2 rounded-t-md bg-slate-600 text-slate-50 p-2 z-[5]">
+      <span class="text-xl">Wybór linii</span><button class="bg-cyan-50 text-slate-600 p-1 mx-2 text-sm rounded-md"
+        onclick="$('#lines').show()">Pokaż</button>
+    </div>
     <div id="lines"
-        class="absolute w-full h-full text-lg text-slate-900 sm:max-h-96 lg:w-11/12 sm:h-auto mx-auto left-0 right-0 bottom-0 z-10 font-semibold bg-slate-100 lg:rounded-t-md max-w-screen-2xl border-t-2 lg:border-x-2 border-slate-800 overflow-auto">
-      <div class="text-center p-2 chosen flex justify-center items-center text-slate-50 sticky top-0"><span class="text-xl">Wybór linii</span><button class="bg-cyan-50 text-slate-600 p-1 mx-2 text-sm rounded-md" onclick="$('#lines').hide()">Ukryj</button></div>
+      class="absolute w-full h-full text-lg text-slate-900 sm:max-h-96 lg:w-11/12 sm:h-auto mx-auto left-0 right-0 bottom-0 z-10 font-semibold bg-slate-100 lg:rounded-t-md max-w-screen-2xl border-t-2 lg:border-x-2 border-slate-800 overflow-auto">
+      <div class="text-center p-2 chosen flex justify-center items-center text-slate-50 sticky top-0"><span
+          class="text-xl">Wybór linii</span><button class="bg-cyan-50 text-slate-600 p-1 mx-2 text-sm rounded-md"
+          onclick="$('#lines').hide()">Ukryj</button></div>
       <div class="p-2 flex flex-wrap gap-2 justify-between">
-        <button
-          class="line bg-slate-200 w-fit hover:chosen border-2 border-slate-300 rounded-md py-1 px-2"
+        <button class="line bg-slate-200 w-fit hover:chosen border-2 border-slate-300 rounded-md py-1 px-2"
           onclick="ctx.setLines([])">Wyczyść</button>
-        <button
-          class="line bg-slate-200 w-fit hover:chosen border-2 border-slate-300 rounded-md py-1 px-2"
+        <button class="line bg-slate-200 w-fit hover:chosen border-2 border-slate-300 rounded-md py-1 px-2"
           onclick="ctx.setLines({{ lines }})">Wszystkie</button>
         {% if lines %}
         {% for line in lines %}
@@ -61,7 +66,8 @@
       </div>
     </div>
     <div id="details"
-      class="absolute right-0 top-0 h-full w-full sm:w-auto overflow-auto bg-slate-100 border-slate-800 border-l-2 z-10"></div>
+      class="absolute right-0 top-0 h-full w-full sm:w-auto overflow-auto bg-slate-100 border-slate-800 border-l-2 z-10">
+    </div>
   </div>
 </body>
 

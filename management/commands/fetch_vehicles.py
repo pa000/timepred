@@ -126,7 +126,7 @@ class Command(BaseCommand):
             timestamp = timestamp + ".0"
         timestamp = datetime.datetime.strptime(
             timestamp, "%Y-%m-%d %H:%M:%S.%f"
-        ).replace(tzinfo=zoneinfo.ZoneInfo("Europe/Warsaw"))
+        ).replace(tzinfo=WROCLAW_TZ)
         try:
             return RawVehicleData(
                 vehicle_id=int(record["Nr_Boczny"]),

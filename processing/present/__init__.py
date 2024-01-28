@@ -218,6 +218,9 @@ def save(ctx: Context, vc: VehicleCache):
         return
 
     process_stoptime(vc)
+    old_vc = vehicle_cache.get(vc.vehicle_id)
+    if old_vc is not None and old_vc.trip_id != vc.trip_id:
+        vehicle_by_trip.pop(old_vc.trip_id, None)
     vehicle_cache[vc.vehicle_id] = vc
     vehicle_by_trip[vc.trip_id] = vc
 
