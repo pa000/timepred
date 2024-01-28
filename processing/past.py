@@ -6,7 +6,7 @@ from timepred.models import AverageTravelTime, TravelTime, VehicleStopTime
 
 
 def calculate_travel_times(
-    n: int, *, after: datetime | None = None, before: datetime | None = None
+    n: int | None, *, after: datetime | None = None, before: datetime | None = None
 ):
     TravelTime.objects.all().delete()
     with connection.cursor() as cursor:
@@ -27,7 +27,6 @@ def calculate_travel_times(
             JOIN stop s2 ON st2.stop_id = s2.id
             WHERE 
                 vst1.id <> vst2.id
-                AND st2.stop_sequence - {n} <= st1.stop_sequence
                 AND st1.stop_sequence < st2.stop_sequence
                 AND vst1.arrival_time is not null
                 AND vst2.arrival_time is not null"""
@@ -37,6 +36,11 @@ def calculate_travel_times(
                     else ""
                 )
                 + (f" AND vst1.arrival_time >= '{after}'" if after is not None else "")
+                + (
+                    f" AND st2.stop_sequence - {n} <= st1.stop_sequence"
+                    if n is not None
+                    else ""
+                )
             ),
         )
 

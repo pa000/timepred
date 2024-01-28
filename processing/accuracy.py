@@ -1,8 +1,9 @@
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 from multigtfs.models.stop_time import StopTime
 from timepred.models import StopPrediction, StopTimePrediction, VehicleStopTime
 import tqdm
+from timepred.processing.future.strategy import EstimationStrategy
 from timepred.processing.parallel import ParallelManager
 
 from multiprocessing import Pool
@@ -12,8 +13,10 @@ pool = Pool(8)
 import timepred.processing.future as future
 
 
-def test_accuracy(date: date):
+def test_accuracy(strategy: EstimationStrategy, date: date):
     StopPrediction.objects.all().delete()
+    strategy.preprocess_travel_times(before=datetime.combine(date, time(0)))
+
     N = VehicleStopTime.objects.filter(arrival_time__date=date).count()
     vsts = VehicleStopTime.objects.filter(arrival_time__date=date)
 
