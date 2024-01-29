@@ -31,6 +31,8 @@ class Present {
     fetch(`/details?vehicle_id=${this.detailsId}`)
       .then(response => response.json())
       .then(details => {
+        if (!this.lines.includes(details.route_name))
+          this.toggleLine(details.route_name)
         renderDetails(details);
 
         $('#details').html(details.view);

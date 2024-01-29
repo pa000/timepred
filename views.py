@@ -267,6 +267,7 @@ def details(request):
 
     return JsonResponse(
         {
+            "route_name": vehicle.route.route_id,
             "shape_prev": prev,
             "shape_next": next,
             "stops": {

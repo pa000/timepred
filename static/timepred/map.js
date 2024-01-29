@@ -34,10 +34,7 @@ function renderDetails(details) {
     color = stop.stop_id == details.current_stop_id ? 'orange' : color;
 
     L.circleMarker(stop.geometry, { radius: 5, color: color, fill: true, fillOpacity: 1 }).addTo(lineShapeGroup);
-    L.circleMarker(stop.projected, { radius: 3, color: color, fill: true, fillOpacity: 1 }).addTo(lineShapeGroup);
   }
-
-  L.circleMarker(details.shape_pos, { radius: 6, color: 'orange', fillOpacity: 1, fill: true }).addTo(markerGroup);
 
   markerGroup.bringToFront();
 }
