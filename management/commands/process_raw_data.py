@@ -20,7 +20,7 @@ import timepred.processing.present as present
 import timepred.processing.future as future
 from timepred.processing.present import process_many_data
 
-present.STRATEGY = NullStrategy
+present.STRATEGY = NullStrategy()
 present.init(False)
 
 BATCH_SIZE = 5000

@@ -225,9 +225,13 @@ def details(request):
             "stoptime__stop_sequence"
         ).last()
     )
-    sps = StopPrediction.objects.prefetch_related("stoptimeprediction_set").filter(
-        trip_instance=trip_instance, made_at=last_stoptime
-    )
+
+    if last_stoptime is not None:
+        sps = StopPrediction.objects.prefetch_related("stoptimeprediction_set").filter(
+            trip_instance=trip_instance, made_at=last_stoptime
+        )
+    else:
+        sps = []
 
     estimated_times = {}
 

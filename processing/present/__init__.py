@@ -23,6 +23,7 @@ from django.contrib.gis.db.models.functions import Distance, Length, LineLocateP
 from django.contrib.gis.geos import LineString, Point
 from django.db.models import Max, Min, QuerySet, Q, prefetch_related_objects
 from timepred.processing.future.strategy import (
+    EstimationStrategy,
     SingleStopStrategy,
     get_average_travel_times,
     round_to_n_seconds,
@@ -39,7 +40,7 @@ import timepred.processing.future as future
 
 from multiprocessing import Pool, Manager, Process, Queue
 
-STRATEGY = SingleStopStrategy(
+STRATEGY: EstimationStrategy = SingleStopStrategy(
     20, get_average_travel_times, round_to_n_seconds(15), True
 )
 
