@@ -3,6 +3,8 @@ import sys
 
 import logging
 
+from timepred.processing.future.strategy import NullStrategy
+
 logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 import warnings
@@ -18,8 +20,8 @@ import timepred.processing.present as present
 import timepred.processing.future as future
 from timepred.processing.present import process_many_data
 
+present.STRATEGY = NullStrategy
 present.init(False)
-future.init(False)
 
 BATCH_SIZE = 5000
 

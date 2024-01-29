@@ -6,15 +6,11 @@ from multigtfs.models.feed import Feed
 from multigtfs.models.trip import Trip
 
 import sys
-import timepred.processing.past as past
+from timepred.processing.present import STRATEGY
 
 logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        feed = Feed.objects.order_by("feedinfo__start_date").last()
-        if feed is None:
-            return
-
-        past.calculate_travel_times(1, timezone.now())
+        STRATEGY.preprocess_travel_times()
