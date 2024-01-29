@@ -219,16 +219,16 @@ def details(request):
         )
     }
 
-    last_stoptime = (
+    last_vst = (
         vehicle.current_vehiclestoptime
         or vehicle.trip_instance.vehiclestoptime_set.order_by(
             "stoptime__stop_sequence"
         ).last()
     )
 
-    if last_stoptime is not None:
+    if last_vst is not None:
         sps = StopPrediction.objects.prefetch_related("stoptimeprediction_set").filter(
-            trip_instance=trip_instance, made_at=last_stoptime
+            trip_instance=trip_instance, made_at=last_vst.stoptime
         )
     else:
         sps = []
