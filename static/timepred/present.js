@@ -28,11 +28,12 @@ class Present {
     if (this.detailsType != 'vehicle' || this.detailsId == null)
       return;
 
-    fetch(`/details?vehicle_id=${this.detailsId}`)
+    fetch(`/details?vehicle_id=${this.detailsId[0]}`)
       .then(response => response.json())
       .then(details => {
+        this.detailsId[1] = details.route_name;
         if (!this.lines.includes(details.route_name))
-          this.toggleLine(details.route_name)
+          this.toggleLine(details.route_name);
         renderDetails(details);
 
         $('#details').html(details.view);
@@ -51,6 +52,8 @@ class Present {
       clear();
       $('#details').hide();
       $('#history').hide();
+      this.detailsId = null;
+      this.detailsType = null;
       return;
     }
     $('#history').show();
@@ -59,8 +62,7 @@ class Present {
       .then(response => response.json())
       .then(vehicles =>
         renderVehicles(vehicles, vehicleId => {
-          this.detailsId = vehicleId;
-          this.detailsType = 'vehicle';
+          this.setDetails('vehicle', vehicleId);
           $('#details').show();
           this.showDetails();
         }));
@@ -69,11 +71,14 @@ class Present {
   }
 
   setDetails(type, id) {
-    if (type != 'stop' && type != 'vehicle')
-      return;
+    if (type != 'stop' && type != 'vehicle') {
+        this.detailsId = null;
+        this.detailsType = null;
+        return;
+    }
 
     this.detailsType = type;
-    this.detailsId = id;
+    this.detailsId = (type == 'vehicle') ? [id, null] : id;
     $('#details').show();
     this.showDetails();
   }
@@ -94,6 +99,12 @@ class Present {
     }
 
     this.lines = l;
+
+    if (this.detailsType == 'vehicle' && !this.lines.includes(this.detailsId[1])) {
+      this.detailsType = null;
+      this.detailsId = null;
+      clearShape();
+    }
 
     for (let line of this.lines) {
       $(`#line-${line}`).addClass('chosen');

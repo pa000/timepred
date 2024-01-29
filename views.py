@@ -5,7 +5,6 @@ from multigtfs.models.stop import Stop
 from timepred.processing.constants import WROCLAW_TZ, WROCLAW_UTM, WSG84
 from timepred.processing.geohelper import cut
 from timepred.processing.present.get import get_position, get_route_ids
-from django.core.cache import cache
 from django.contrib.gis.geos import LineString, Point
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F, OuterRef, QuerySet, Subquery, Q

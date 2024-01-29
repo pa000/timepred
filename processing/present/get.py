@@ -19,11 +19,6 @@ def get_position(rd: RawVehicleData) -> Point:
 
 
 def get_route_ids():
-    ROUTES = "route_ids"
-    routes = cache.get(ROUTES)
-    if routes is not None:
-        return routes
-
     today = datetime.datetime.today()
     feed = (
         Feed.objects.filter(
@@ -36,7 +31,6 @@ def get_route_ids():
         return []
 
     routes = list(feed.route_set.order_by("id").values_list("route_id", flat=True))
-    cache.set(ROUTES, routes, timeout=60 * 60)
     return routes
 
 

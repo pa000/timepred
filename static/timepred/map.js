@@ -58,5 +58,10 @@ function renderVehicle(vehicle, callback) {
 }
 
 function clear() {
-  markerGroup.clearLayers();
+  markerGroup.clearLayers(); 
+  clearShape();
+}
+
+function clearShape() {
+  lineShapeGroup.clearLayers();
 }
