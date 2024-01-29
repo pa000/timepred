@@ -46,7 +46,8 @@ def test_accuracy(strategy: EstimationStrategy, date: date):
             continue
 
         preds = StopTimePrediction.objects.filter(
-            stop_prediction__stoptime=vst.stoptime
+            stop_prediction__stoptime=vst.stoptime,
+            stop_prediction__trip_instance=vst.trip_instance,
         )
         real_arrival_minute = vst.arrival_time.replace(second=0, microsecond=0)
 
@@ -64,3 +65,10 @@ def test_accuracy(strategy: EstimationStrategy, date: date):
     results_ratio = {p: sum(r) / len(r) for p, r in results.items() if len(r) > 0}
 
     return sorted(results_ratio.items(), key=lambda p: p[0])
+
+
+def save_to_file(results: list[tuple[int, float]], filename: str):
+    with open(filename, "w") as file:
+        file.write("probability,score\n")
+        for p, r in results:
+            file.write(f"{p},{r*100}\n")
