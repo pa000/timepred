@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from datetime import datetime, timedelta
+from functools import partial
 from typing import Callable
 from multigtfs.models.stop_time import StopTime
 from timepred.models import AverageTravelTime, VehicleStopTime
@@ -134,10 +135,12 @@ class NullStrategy(EstimationStrategy):
 
 
 def get_average_travel_times(from_st: StopTime, to_st: StopTime, vst: VehicleStopTime):
-    return AverageTravelTime.objects.filter(
-        from_stop_code=from_st.stop.code,
-        to_stop_code=to_st.stop.code,
-        hour=vst.arrival_time.hour,
+    return list(
+        AverageTravelTime.objects.filter(
+            from_stop_code=from_st.stop.code,
+            to_stop_code=to_st.stop.code,
+            hour=vst.arrival_time.hour,
+        )
     )
 
 
@@ -145,9 +148,18 @@ def get_timetable_times(from_st: StopTime, to_st: StopTime, vst: VehicleStopTime
     return [to_st.arrival_time.to_timedelta() - from_st.arrival_time.to_timedelta()]
 
 
-def round_to_n_seconds(n):
-    return lambda dt: (
+def round_seconds(dt, n):
+    return (
         dt
         + timedelta(seconds=n // 2)
         - timedelta(seconds=(dt.second + n // 2) % n, microseconds=dt.microsecond)
     )
+
+
+def round_to_n_seconds(n):
+    return partial(round_seconds, n=n)
+
+
+single_stop_20 = SingleStopStrategy(
+    20, get_average_travel_times, round_to_n_seconds(20), False
+)

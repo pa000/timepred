@@ -49,6 +49,8 @@ class TripInstance(models.Model):
 
 
 class StopPrediction(models.Model):
+    id: int
+    stoptime_id: int
     stoptimeprediction_set: models.Manager["StopTimePrediction"]
 
     stop_code = models.CharField(max_length=255, db_index=True)
@@ -56,8 +58,13 @@ class StopPrediction(models.Model):
     trip_instance = models.ForeignKey(TripInstance, on_delete=models.CASCADE)
     made_at = models.ForeignKey(StopTime, on_delete=models.CASCADE, related_name="+")
 
+    def __str__(self) -> str:
+        return f"SP{self.id}-{self.stop_code}-{self.stoptime_id}-{self.trip_instance}"
+
 
 class StopTimePrediction(models.Model):
+    id: int
+
     stop_prediction = models.ForeignKey(StopPrediction, on_delete=models.CASCADE)
     probability = models.FloatField()
     time = models.DateTimeField()
@@ -71,6 +78,9 @@ class StopTimePrediction(models.Model):
             i = field_names.index("time")
             values[i] = values[i].astimezone(WROCLAW_TZ)
         return super().from_db(db, field_names, values)
+
+    def __str__(self):
+        return f"STP{self.id}-{self.time}-{self.probability:.2f}"
 
 
 class RawVehicleData(models.Model):

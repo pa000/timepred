@@ -5,6 +5,7 @@ from timepred.models import StopPrediction, StopTimePrediction, VehicleStopTime
 import tqdm
 from timepred.processing.future.strategy import EstimationStrategy
 from timepred.processing.parallel import ParallelManager
+from functools import partial
 
 from multiprocessing import Pool
 
@@ -13,17 +14,27 @@ pool = Pool(8)
 import timepred.processing.future as future
 
 
-def test_accuracy(strategy: EstimationStrategy, date: date):
+def test_accuracy(
+    strategy: EstimationStrategy, date: date, skip_preprocessing: bool = False
+):
     StopPrediction.objects.all().delete()
-    strategy.preprocess_travel_times(before=datetime.combine(date, time(0)))
+    print(".")
+    if not skip_preprocessing:
+        print("..")
+        strategy.preprocess_travel_times(before=datetime.combine(date, time(0)))
 
+    print("...")
     N = VehicleStopTime.objects.filter(arrival_time__date=date).count()
     vsts = VehicleStopTime.objects.filter(arrival_time__date=date)
+    vsts = VehicleStopTime.objects.filter(trip_instance_id=607552)
 
     all_sps = []
     all_stps = []
     for sps, stps in tqdm.tqdm(
-        pool.imap_unordered(future.get_stoptime_predictions, vsts.iterator(5000)),
+        pool.imap_unordered(
+            partial(future.get_stoptime_predictions, strategy=strategy),
+            vsts.iterator(5000),
+        ),
         total=vsts.count(),
     ):
         if len(all_stps) > 50000:
@@ -52,13 +63,7 @@ def test_accuracy(strategy: EstimationStrategy, date: date):
         real_arrival_minute = vst.arrival_time.replace(second=0, microsecond=0)
 
         for stp in preds:
-            result = (
-                real_arrival_minute == stp.time
-                or (vst.arrival_time + timedelta(seconds=10)).replace(
-                    second=0, microsecond=0
-                )
-                == stp.time
-            )
+            result = real_arrival_minute == stp.time
             prob = int(stp.probability * 100)
             results[prob].append(result)
 
