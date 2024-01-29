@@ -163,3 +163,5 @@ def round_to_n_seconds(n):
 single_stop_20 = SingleStopStrategy(
     20, get_average_travel_times, round_to_n_seconds(20), False
 )
+
+direct_stop_20 = DirectStrategy(20, get_average_travel_times, round_to_n_seconds(20))

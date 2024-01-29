@@ -1,16 +1,14 @@
+from multiprocessing import Pool
+
+pool = Pool(10)
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta
 from multigtfs.models.stop_time import StopTime
 from timepred.models import StopPrediction, StopTimePrediction, VehicleStopTime
 import tqdm
-from timepred.processing.future.strategy import EstimationStrategy
-from timepred.processing.parallel import ParallelManager
 from functools import partial
 
-from multiprocessing import Pool
-
-pool = Pool(8)
-
+from timepred.processing.future.strategy import EstimationStrategy
 import timepred.processing.future as future
 
 
@@ -18,15 +16,11 @@ def test_accuracy(
     strategy: EstimationStrategy, date: date, skip_preprocessing: bool = False
 ):
     StopPrediction.objects.all().delete()
-    print(".")
     if not skip_preprocessing:
-        print("..")
         strategy.preprocess_travel_times(before=datetime.combine(date, time(0)))
 
-    print("...")
     N = VehicleStopTime.objects.filter(arrival_time__date=date).count()
     vsts = VehicleStopTime.objects.filter(arrival_time__date=date)
-    vsts = VehicleStopTime.objects.filter(trip_instance_id=607552)
 
     all_sps = []
     all_stps = []

@@ -22,6 +22,11 @@ from timepred.models import (
 from django.contrib.gis.db.models.functions import Distance, Length, LineLocatePoint
 from django.contrib.gis.geos import LineString, Point
 from django.db.models import Max, Min, QuerySet, Q, prefetch_related_objects
+from timepred.processing.future.strategy import (
+    SingleStopStrategy,
+    get_average_travel_times,
+    round_to_n_seconds,
+)
 from timepred.processing.geohelper import remove_closest_segments
 from multigtfs.models.feed import Feed
 from multigtfs.models.route import Route
@@ -34,6 +39,9 @@ import timepred.processing.future as future
 
 from multiprocessing import Pool, Manager, Process, Queue
 
+STRATEGY = SingleStopStrategy(
+    20, get_average_travel_times, round_to_n_seconds(15), True
+)
 
 m = Manager()
 vehicle_queue: "Queue[RawVehicleData]" = Queue(1000)
@@ -106,7 +114,7 @@ def process_arrival(old_vc: VehicleCache, new_vc: VehicleCache):
         )
         vst.save()
         new_vc.current_vehiclestoptime = vst
-        future.estimate_and_save_stoptime_predictions(new_vc)
+        future.estimate_and_save_stoptime_predictions(vst, STRATEGY)
 
     elif (
         old_vc.trip_instance.id is not None
@@ -129,7 +137,7 @@ def process_arrival(old_vc: VehicleCache, new_vc: VehicleCache):
             trip_instance=old_vc.trip_instance,
         )
         vst.save()
-        future.estimate_and_save_stoptime_predictions(new_vc)
+        future.estimate_and_save_stoptime_predictions(vst, STRATEGY)
 
 
 def process_stoptime(vc: VehicleCache) -> VehicleStopTime | None:

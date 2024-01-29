@@ -13,9 +13,17 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 HISTORY_URL = "https://opendata.cui.wroclaw.pl/dataset/rozkladjazdytransportupublicznegoplik_data/resource_history/9a5a2a1a-12f5-4533-82b0-21eee30dbe51"
-URL_PATTERN =  "https://www.wroclaw.pl/open-data/dataset/657cc0c0-3ed6-48ed-976f-8ddf5f576f09/resource/8cfbf542-c477-47ca-bddd-0492670a3987/download_old_version/[^\"]+.zip"
+URL_PATTERN = 'https://www.wroclaw.pl/open-data/dataset/657cc0c0-3ed6-48ed-976f-8ddf5f576f09/resource/8cfbf542-c477-47ca-bddd-0492670a3987/download_old_version/[^"]+.zip'
+
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--all",
+            action="store_true",
+            help="download and import all feeds that start today or later",
+        )
+
     def handle(self, *args, **options):
         feed_urls = self.get_feed_urls()
         for feed_url in feed_urls:
@@ -30,6 +38,12 @@ class Command(BaseCommand):
 
             logging.debug(f"{filename} starts on {feed_start_date}")
             exists_feed = self.exists_feed_starting_on(feed_start_date)
+            latest_feed = FeedInfo.objects.order_by("start_date").last()
+            if latest_feed is not None and latest_feed.start_date is not None:
+                latest_date = latest_feed.start_date
+            else:
+                latest_date = date.min
+
             if not exists_feed:
                 logging.debug("and is a new feed")
                 name = feed_start_date or str(date.today())
@@ -40,6 +54,8 @@ class Command(BaseCommand):
 
             os.remove(filename)
 
+            if not options["all"] and feed_start_date <= latest_date:
+                break
             if feed_start_date <= datetime.now(WROCLAW_TZ).date():
                 break
 

@@ -1,6 +1,7 @@
 import datetime
 
 import shapely
+from multigtfs.models.stop import Stop
 from timepred.processing.constants import WROCLAW_TZ, WROCLAW_UTM, WSG84
 from timepred.processing.geohelper import cut
 from timepred.processing.present.get import get_position, get_route_ids
@@ -105,6 +106,11 @@ def stop(request):
         trip__service__servicedates__date=now.date(),
     )
 
+    if len(stoptimes) == 0:
+        return JsonResponse({"view": "brak danych"}, safe=False)
+
+    stop = stoptimes[0].stop
+
     sps = (
         StopPrediction.objects.filter(
             stop_code=stop_code,
@@ -146,8 +152,6 @@ def stop(request):
             .vehicle_id,
         }
 
-    print(predictions)
-
     return JsonResponse(
         {
             "view": render_to_string(
@@ -156,7 +160,7 @@ def stop(request):
                     "predictions": sorted(
                         predictions.values(), key=lambda p: p["time"]
                     ),
-                    "stop_name": sp.stoptime.stop.name,
+                    "stop_name": stop.name,
                 },
             )
         },
@@ -215,8 +219,14 @@ def details(request):
         )
     }
 
+    last_stoptime = (
+        vehicle.current_vehiclestoptime
+        or vehicle.trip_instance.vehiclestoptime_set.order_by(
+            "stoptime__stop_sequence"
+        ).last()
+    )
     sps = StopPrediction.objects.prefetch_related("stoptimeprediction_set").filter(
-        trip_instance=trip_instance, made_at_next_stoptime=vehicle.next_stoptime
+        trip_instance=trip_instance, made_at=last_stoptime
     )
 
     estimated_times = {}

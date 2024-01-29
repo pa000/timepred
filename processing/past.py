@@ -46,6 +46,9 @@ def calculate_travel_times(
 
 
 def calculate_average_travel_times(bin_dur: int):
+    if bin_dur <= 0:
+        raise Exception("bin_dur must be positive.")
+
     AverageTravelTime.objects.all().delete()
     with connection.cursor() as cursor:
         cursor.execute(
