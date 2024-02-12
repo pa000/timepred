@@ -13,7 +13,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 HISTORY_URL = "https://opendata.cui.wroclaw.pl/dataset/rozkladjazdytransportupublicznegoplik_data/resource_history/9a5a2a1a-12f5-4533-82b0-21eee30dbe51"
-URL_PATTERN = 'https://www.wroclaw.pl/open-data/dataset/657cc0c0-3ed6-48ed-976f-8ddf5f576f09/resource/8cfbf542-c477-47ca-bddd-0492670a3987/download_old_version/[^"]+.zip'
+URL_PATTERN = 'https://www.wroclaw.pl/open-data/dataset/657cc0c0-3ed6-48ed-976f-8ddf5f576f09/resource/[^/]+/download_old_version/[^"]+.zip'
 
 
 class Command(BaseCommand):
