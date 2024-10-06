@@ -48,6 +48,7 @@ class RouteByDate:
                 .first()
             )
             if feed is None:
+                start_date += timedelta(days=1)
                 continue
 
             for route in feed.route_set.annotate(
