@@ -15,15 +15,15 @@ class Migration(migrations.Migration):
             old_name='made_at_next_stoptime',
             new_name='made_at',
         ),
+        migrations.AlterField(
+            model_name='averagetraveltime',
+            name='from_stop_code',
+            field=models.CharField(max_length=255),
+        ),
         migrations.AddField(
             model_name='averagetraveltime',
             name='id',
             field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
             preserve_default=False,
-        ),
-        migrations.AlterField(
-            model_name='averagetraveltime',
-            name='from_stop_code',
-            field=models.CharField(max_length=255),
         ),
     ]
